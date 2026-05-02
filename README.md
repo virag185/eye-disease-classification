@@ -48,3 +48,10 @@ The generated browser model is written to `app/assets/model.js`.
 ## Note
 
 This is for education and hackathon demonstration. It is not a medical device or a substitute for clinical diagnosis.
+## 📸 Output
+
+### App Interface
+![UI](images/app_ui.png)
+
+### Prediction Result
+![Prediction](images/prediction.png)
