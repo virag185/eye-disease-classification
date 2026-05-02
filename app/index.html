@@ -1,0 +1,194 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>RetinalAI | Eye Disease Screening</title>
+    <link rel="stylesheet" href="styles.css">
+  </head>
+  <body>
+    <div class="page">
+      <nav>
+        <div class="nav-logo">
+          <div class="nav-logo-icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24">
+              <circle cx="12" cy="12" r="3"></circle>
+              <path d="M2 12s4-7 10-7 10 7 10 7-4 7-10 7S2 12 2 12z"></path>
+            </svg>
+          </div>
+          <div class="nav-logo-name">Retinal<span>AI</span></div>
+        </div>
+        <div class="nav-tag" id="modelTag">RetinaForge API</div>
+      </nav>
+
+      <header class="hero hero-shell">
+        <div class="hero-copy">
+          <div class="hero-eyebrow"><span class="hero-dot"></span>Ophthalmology AI - Local Screening</div>
+          <h1>Detect Eye Disease with a <em>Smart Retina Scan</em></h1>
+          <p class="hero-desc">Upload a fundus photograph or try a dataset sample. The local backend classifies the scan across four major eye conditions and returns confidence, risk, and care guidance.</p>
+          <div class="class-row">
+            <span class="cls-pill cls-normal"><span class="cls-dot"></span>Normal</span>
+            <span class="cls-pill cls-dr"><span class="cls-dot"></span>Diabetic Retinopathy</span>
+            <span class="cls-pill cls-cat"><span class="cls-dot"></span>Cataract</span>
+            <span class="cls-pill cls-gla"><span class="cls-dot"></span>Glaucoma</span>
+          </div>
+        </div>
+
+        <div class="hero-visual" aria-hidden="true">
+          <div class="retina-orbit">
+            <span class="orbit orbit-a"></span>
+            <span class="orbit orbit-b"></span>
+            <span class="orbit orbit-c"></span>
+            <div class="retina-sphere">
+              <span class="retina-disc"></span>
+              <span class="retina-vessel vessel-one"></span>
+              <span class="retina-vessel vessel-two"></span>
+              <span class="retina-vessel vessel-three"></span>
+            </div>
+          </div>
+          <div class="floating-card card-a">
+            <strong>4-class AI</strong>
+            <span>Real retinal examples</span>
+          </div>
+          <div class="floating-card card-b">
+            <strong>Local backend</strong>
+            <span>Private browser upload</span>
+          </div>
+        </div>
+      </header>
+
+      <section class="stats" aria-label="Model statistics">
+        <div class="stat"><div class="stat-n">90%</div><div class="stat-l">Project Target</div></div>
+        <div class="stat"><div class="stat-n">4</div><div class="stat-l">Disease Classes</div></div>
+        <div class="stat"><div class="stat-n" id="statAccuracy">73%</div><div class="stat-l">Current Validation</div></div>
+        <div class="stat"><div class="stat-n" id="statImages">4K+</div><div class="stat-l">Training Images</div></div>
+      </section>
+
+      <section class="class-atlas" id="classAtlas" aria-label="Four class retinal examples"></section>
+
+      <section class="upload-card" id="uploadCard">
+        <div class="upload-card-header">
+          <div>
+            <div class="upload-card-title">Upload Retinal Image</div>
+            <div class="upload-card-sub">Fundus photograph - JPG, PNG, JPEG</div>
+          </div>
+        </div>
+
+        <div class="upload-grid">
+          <div class="upload-workflow">
+            <label class="drop-zone" id="dropZone" for="fileInput">
+              <div class="dz-icon" aria-hidden="true">
+                <svg viewBox="0 0 24 24">
+                  <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                  <polyline points="17 8 12 3 7 8"></polyline>
+                  <line x1="12" y1="3" x2="12" y2="15"></line>
+                </svg>
+              </div>
+              <div class="dz-title">Drop your image here</div>
+              <div class="dz-sub">or <span>click to browse</span></div>
+            </label>
+            <input type="file" id="fileInput" accept="image/*" multiple>
+
+            <div class="thumb-row" id="thumbRow"></div>
+
+            <div class="sample-panel">
+              <div>
+                <div class="sample-title">Try dataset samples</div>
+                <div class="sample-sub">Use built-in examples when you do not have an image ready.</div>
+              </div>
+              <div class="sample-rail" id="sampleRail"></div>
+            </div>
+
+            <div class="upload-guidance">
+              <div class="guide-title">Before uploading, use a clear retinal image</div>
+              <ul>
+                <li>Use a fundus image with the retina centered and visible.</li>
+                <li>Avoid blurred, very dark, or cropped images for better screening output.</li>
+                <li>If the result is high risk, consult an ophthalmologist for confirmation.</li>
+              </ul>
+            </div>
+          </div>
+
+          <aside class="preview-panel">
+            <div class="preview-stage">
+              <span class="preview-ring ring-x"></span>
+              <span class="preview-ring ring-y"></span>
+              <img id="previewImage" alt="Selected retinal preview">
+              <div class="preview-placeholder" id="previewPlaceholder">
+                <span>3D scan preview</span>
+                <strong>No image selected</strong>
+              </div>
+            </div>
+            <div class="file-meta" id="fileMeta">
+              <strong>Ready for scan</strong>
+              <span>Select an upload or dataset sample to begin.</span>
+            </div>
+            <button class="btn-analyze" id="btnAnalyze" type="button" disabled>Analyze Image</button>
+          </aside>
+        </div>
+      </section>
+
+      <section class="spinner-wrap" id="spinnerWrap">
+        <div class="spin-ring"></div>
+        <div class="spin-txt">Running inference on your retinal image...</div>
+      </section>
+
+      <section id="results">
+        <div class="res-grid">
+          <article class="res-card">
+            <div class="res-label">Diagnosis</div>
+            <div class="res-class" id="resClass">-</div>
+            <div class="res-conf">Model similarity: <strong id="resConf">-</strong></div>
+            <div id="riskPill" class="risk-pill risk-low"><span class="risk-dot"></span><span id="riskTxt">-</span></div>
+            <div class="chip-row">
+              <div class="chip" id="chipTime">Backend inference</div>
+              <div class="chip" id="chipQuality">Quality -</div>
+              <div class="chip">Screening support only</div>
+            </div>
+          </article>
+
+          <article class="res-card">
+            <div class="res-label prob-section">Class probabilities</div>
+            <div id="probBars"></div>
+          </article>
+        </div>
+
+        <article class="details-card">
+          <div>
+            <div class="res-label">Uploaded scan details</div>
+            <div class="detail-list" id="scanDetails"></div>
+          </div>
+          <div>
+            <div class="res-label">Detected class references</div>
+            <div class="reference-strip" id="referenceStrip"></div>
+          </div>
+        </article>
+
+        <article class="advice-card" id="adviceCard">
+          <div class="adv-head">
+            <div class="adv-icon-wrap" id="advIconWrap"><span id="advIcon"></span></div>
+            <div class="adv-titles">
+              <div class="adv-title" id="advTitle"></div>
+              <div class="adv-sub" id="advSub"></div>
+            </div>
+          </div>
+          <div class="adv-body">
+            <ul class="adv-steps" id="advSteps"></ul>
+          </div>
+        </article>
+
+        <button class="btn-reset" id="btnReset" type="button">Analyze another image</button>
+      </section>
+    </div>
+
+    <div class="toast-wrap"><div class="toast" id="toast"></div></div>
+
+    <footer>
+      RetinalAI - RetinaForge local backend - Balanced fundus dataset
+      <div class="disclaimer">For research and screening purposes only. Not a substitute for professional medical diagnosis.</div>
+    </footer>
+
+    <script src="assets/model.js?v=retinalai-model"></script>
+    <script src="app.js?v=interactive-retinalai-restore"></script>
+  </body>
+</html>
